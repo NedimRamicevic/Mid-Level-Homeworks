@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div class="list">
+      <button onclick="selectedPrice(100)">100</button>
+      <button onclick="selectedPrice(200)">200</button>
+      <button onclick="selectedPrice(300)">300</button>
+      <button onclick="selectedPrice(400)">400</button>
+    </div>
+    <div class="table"></div>
+    <script>
+      function deleteProduct(id) {
+        axios
+          .delete(`https://northwind.vercel.app/api/products/${id}`)
+          .then((res) => {
+            console.log(res);
+          });
+      }
+
+      function selectedPrice(price) {
+        axios
+          .get(`https://northwind.vercel.app/api/products?unitPrice<=${price}`)
+          .then((res) => {
+            console.log(res.data);
+            var products2 = res.data;
+            var html2 = `
+          <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Unit Price</th>
+              <th>Stock</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              products2 &&
+              products2
+                .map((product) => {
+                  return `
+                    <tr>
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.unitPrice}</td>
+                    <td>${product.unitsInStock}</td>
+                    <td>
+                        <button onclick="deleteProduct(${product.id})">Delete</button>
+                    </td>
+                    </tr>
+                    `;
+                })
+                .join("")
+            }
+          </tbody>
+        </table>
+          `;
+            document.querySelector(".table").innerHTML = html2;
+          });
+      }
+    </script>
+  </body>
+
+  <script>
+    axios.get("https://northwind.vercel.app/api/products").then((res) => {
+      var products = res.data;
+
+      var html = `
+      <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Unit Price</th>
+          <th>Stock</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${
+          products &&
+          products
+            .map((product) => {
+              return `
+                <tr>
+                <td>${product.id}</td>
+                <td>${product.name}</td>
+                <td>${product.unitPrice}</td>
+                <td>${product.unitsInStock}</td>
+                <td>
+                    <button onclick="deleteProduct(${product.id})">Delete</button>
+                </td>
+                </tr>
+                `;
+            })
+            .join("")
+        }
+      </tbody>
+    </table>
+      `;
+      document.querySelector(".table").innerHTML = html;
+    });
+  </script>
+</html>
